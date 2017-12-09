@@ -72,14 +72,12 @@ func ModifyAccount(num int, u user.User) error {
 
 func GetAccount(num int) (user.User, error) {
 	sql := fmt.Sprintf("select  Name, Pwd, Age, Exp from account where Num = %d;", num)
-	rows, err := DbHd.db.Query(sql)
+	rows := DbHd.db.QueryRow(sql)
+
 	var oneuser user.User
-	if err != nil {
-		return oneuser, err
-	}
-	if rows.Next() {
-		rows.Scan(&oneuser.Name, &oneuser.Pwd, &oneuser.Age, &oneuser.Exp)
-	}
+
+	rows.Scan(&oneuser.Name, &oneuser.Pwd, &oneuser.Age, &oneuser.Exp)
+
 	oneuser.Num = num
 	return oneuser, nil
 }

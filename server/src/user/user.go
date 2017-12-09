@@ -7,7 +7,11 @@ package user
 
 import (
 	"errors"
+
 	"sync"
+
+	"../log"
+	//"../sql/mysql"
 )
 
 type User struct {
@@ -18,6 +22,8 @@ type User struct {
 	Pwd  string
 	rw   sync.RWMutex
 }
+
+var Tlog = golog.GetLogHaddle()
 
 var UserMap map[int]User
 
@@ -36,9 +42,5 @@ func ModifyAccount() {
 }
 
 func DeleteAccount() {
-
-}
-
-func CreateAccount() {
 
 }
