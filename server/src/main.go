@@ -1,3 +1,8 @@
+/* ====================================================================*/
+/* Copyright (c) 2017.  All rights reserved.                           */
+/* Author:     libinbin_1014@sina.com                                  */
+/* Date :      2017/12/09                                              */
+/* ====================================================================*/
 package main
 
 import (
@@ -13,7 +18,7 @@ import (
 	"./log"
 	"./socket"
 	"./sql/mysql"
-	"./user"
+	//	"./user"
 )
 
 var (
@@ -118,10 +123,12 @@ func EnvInit() {
 }
 
 func SqlInit() {
-	defer Tlog.Infoln("mysql init ok")
-	mysql.MysqlInit()
-	a := user.User{Num: 11, Name: "dd", Pwd: "2323", Age: 111, Exp: 9090}
-	mysql.Add(a)
+	err := mysql.MysqlInit()
+	if err != nil {
+		Tlog.Errorln("mysql init err:", err)
+		return
+	}
+	Tlog.Infoln("mysql init ok")
 }
 
 func main() {

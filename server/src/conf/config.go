@@ -1,3 +1,8 @@
+/* ====================================================================*/
+/* Copyright (c) 2017.  All rights reserved.                           */
+/* Author:     libinbin_1014@sina.com                                  */
+/* Date :      2017/12/09                                              */
+/* ====================================================================*/
 package conf
 
 import (
@@ -128,7 +133,7 @@ func GetConfInit() {
 
 	//mysql
 	DbHost = myConfig.read("mysql", "dbhostip", DbHost)
-	DbUser = myConfig.read("mysql", "dbuser", DbUser)
+	DbUser = myConfig.read("mysql", "dbusername", DbUser)
 	DbPwd = myConfig.read("mysql", "dbpwd", DbPwd)
 	Dbname = myConfig.read("mysql", "dbname", Dbname)
 }
