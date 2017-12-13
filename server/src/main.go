@@ -131,8 +131,13 @@ func SqlInit() {
 	Tlog.Infoln("mysql init ok")
 }
 
-func UserInit() {
+func UserStructInit() {
 	defer Tlog.Infoln("user structure init success")
+	user.UserStructInit()
+}
+
+func UserInfoInit() {
+	defer Tlog.Infoln("all user info init success")
 	user.UserInfoInit()
 }
 
@@ -144,8 +149,9 @@ func main() {
 	LogInit()
 	//ProcessInit()
 	SocketInit()
-	UserInit()
+	UserStructInit()
 	SqlInit()
+	UserInfoInit()
 
 	var wg sync.WaitGroup
 	wg.Add(1)

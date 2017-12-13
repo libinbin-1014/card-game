@@ -45,9 +45,22 @@ func GetAccountInfo(num int) (User, error) {
 	}
 }
 
-func UserInfoInit() {
+func UserStructInit() {
 	// init the user.UserMap
 	UserMap = make(map[int]User)
+}
+
+func msgCenter(u User) {
+	for {
+		msg := <-u.mq
+		Tlog.Infoln("recv the msg:", msg)
+	}
+}
+
+func UserInfoInit() {
+	for _, one := range UserMap {
+		go msgCenter(one)
+	}
 }
 
 func ModifyAccount() {
