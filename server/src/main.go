@@ -18,7 +18,7 @@ import (
 	"./log"
 	"./socket"
 	"./sql/mysql"
-	//	"./user"
+	"./user"
 )
 
 var (
@@ -131,6 +131,11 @@ func SqlInit() {
 	Tlog.Infoln("mysql init ok")
 }
 
+func UserInit() {
+	defer Tlog.Infoln("user structure init success")
+	user.UserInfoInit()
+}
+
 func main() {
 	defer KillServer()
 	ConfInit()
@@ -139,6 +144,7 @@ func main() {
 	LogInit()
 	//ProcessInit()
 	SocketInit()
+	UserInit()
 	SqlInit()
 
 	var wg sync.WaitGroup

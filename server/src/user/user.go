@@ -14,6 +14,12 @@ import (
 	//"../sql/mysql"
 )
 
+type Message struct {
+	From    string
+	To      string
+	Context string
+}
+
 type User struct {
 	Num  int
 	Name string
@@ -21,6 +27,8 @@ type User struct {
 	Exp  int
 	Pwd  string
 	rw   sync.RWMutex
+
+	mq chan *Message
 }
 
 var Tlog = golog.GetLogHaddle()
@@ -35,6 +43,11 @@ func GetAccountInfo(num int) (User, error) {
 	} else {
 		return User{}, errors.New("Not Find the user")
 	}
+}
+
+func UserInfoInit() {
+	// init the user.UserMap
+	UserMap = make(map[int]User)
 }
 
 func ModifyAccount() {
