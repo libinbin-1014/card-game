@@ -22,11 +22,35 @@ var Tlog = golog.GetLogHaddle()
 
 const BufLength = 218
 
+func LoginAccount(args []string) (user.User, error) {
+	var oneuser user.User
+
+	if len(args) < 3 || string(args[0]) != "login" {
+		return oneuser, errors.New("LoginAccount para check err\n please input login num pwd")
+	}
+
+	num, _ := strconv.Atoi(args[1])
+	pwd := string(args[2])
+
+	// get user info
+	oneuser, _ = mysql.GetAccount(num)
+	if oneuser.Name == "" {
+		Tlog.Errorln("the user is not exist ,cat not login,", args)
+		return oneuser, errors.New("user is not exist")
+	}
+	if pwd != oneuser.Pwd {
+		Tlog.Errorln("the use pwd is wrong")
+		return oneuser, errors.New("user pwd is wrong")
+	}
+	Tlog.Infoln("Login a account success")
+	return oneuser, nil
+}
+
 func CreateAccount(args []string) error {
 	Tlog.Infoln("register a new account begin,", args)
 
-	if string(args[0]) != "register" {
-		return errors.New("CreateAccount para check err")
+	if len(args) < 5 || string(args[0]) != "register" {
+		return errors.New("CreateAccount para check err\n please input register num name age pwd")
 	}
 
 	num, _ := strconv.Atoi(args[1])
@@ -37,11 +61,6 @@ func CreateAccount(args []string) error {
 
 	// chk the use exist
 	oneuser, err := mysql.GetAccount(num)
-	fmt.Println(oneuser)
-	if err != nil {
-		Tlog.Errorln("get account info err, ", err, args)
-		return err
-	}
 	if oneuser.Name != "" {
 		Tlog.Errorln("the user is exist ,cat not register,", args)
 		return errors.New("user is exist")
@@ -60,6 +79,8 @@ func handleTcpCli(conn net.Conn) {
 	defer conn.Close()
 	defer Tlog.Infoln(conn.RemoteAddr(), " connect closed")
 
+	IsLogin := false
+	var oneuser user.User
 	conn.Write([]byte("welcome to this room"))
 	for {
 		data := make([]byte, 512)
@@ -87,16 +108,36 @@ func handleTcpCli(conn net.Conn) {
 			}
 		*/
 		Tlog.Debugln("recv the client data:", reciveStr)
+
 		tokens := strings.Split(reciveStr, " ")
-		fmt.Println(tokens[0])
 		switch string(tokens[0]) {
 		case "login":
-			fmt.Println("client is login")
+			if !IsLogin {
+				oneuser, err = LoginAccount(tokens)
+				if err != nil {
+					conn.Write([]byte(fmt.Sprintf("Login Failed: %s\n", err.Error())))
+				} else {
+					IsLogin = true
+					conn.Write([]byte(fmt.Sprintf("Login Success\n user exp is %d\n", oneuser.Exp)))
+				}
+			} else {
+				conn.Write([]byte(fmt.Sprintf("the user have been login\n the num is %d\n", oneuser.Num)))
+			}
 		case "register":
-			CreateAccount(tokens)
+			if !IsLogin {
+				err = CreateAccount(tokens)
+				if err != nil {
+					conn.Write([]byte(fmt.Sprintf("register failed:%s", err.Error())))
+				} else {
+					conn.Write([]byte("congratulation, register success"))
+				}
+			} else {
+				conn.Write([]byte("have been login, do not need register"))
+			}
 		default:
 			fmt.Println("unknow the cmd")
 		}
+
 	}
 }
 
