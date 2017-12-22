@@ -42,6 +42,8 @@ func MysqlInit() error {
 		return err
 	}
 
+	user.MapRsync.Lock()
+	defer user.MapRsync.Unlock()
 	for rows.Next() {
 		var oneUser user.User
 		err = rows.Scan(&oneUser.Num, &oneUser.Name, &oneUser.Pwd, &oneUser.Age, &oneUser.Exp)
@@ -59,6 +61,8 @@ func MysqlUninit() {
 }
 
 func AddAccount(u user.User) error {
+	user.MapRsync.Lock()
+	defer user.MapRsync.Unlock()
 	if _, ok := user.UserMap[u.Num]; ok {
 		return ModifyAccount(u.Num, u)
 	}
@@ -75,6 +79,8 @@ func AddAccount(u user.User) error {
 }
 
 func DelAccount(num int) error {
+	user.MapRsync.Lock()
+	defer user.MapRsync.Unlock()
 	if _, ok := user.UserMap[num]; ok {
 		delete(user.UserMap, num)
 	} else {
@@ -91,6 +97,8 @@ func DelAccount(num int) error {
 }
 
 func ModifyAccount(num int, t_user user.User) error {
+	user.MapRsync.Lock()
+	defer user.MapRsync.Unlock()
 	u := t_user
 	var one user.User
 	one, ok := user.UserMap[num]
@@ -131,6 +139,8 @@ func ModifyAccount(num int, t_user user.User) error {
 }
 
 func GetAccount(num int) (user.User, error) {
+	user.MapRsync.RLock()
+	defer user.MapRsync.RUnlock()
 	var one user.User
 	if one, ok := user.UserMap[num]; ok {
 		return one, nil

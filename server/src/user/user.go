@@ -31,6 +31,8 @@ type User struct {
 	mq chan *Message
 }
 
+var MapRsync sync.RWMutex
+
 var Tlog = golog.GetLogHaddle()
 
 var UserMap map[int]User
@@ -58,6 +60,8 @@ func msgCenter(u User) {
 }
 
 func UserInfoInit() {
+	MapRsync.RLock()
+	defer MapRsync.RUnlock()
 	for _, one := range UserMap {
 		go msgCenter(one)
 	}

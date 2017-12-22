@@ -134,6 +134,14 @@ func handleTcpCli(conn net.Conn) {
 			} else {
 				conn.Write([]byte("have been login, do not need register"))
 			}
+		case "listuser":
+			userNumList := []string{}
+			user.MapRsync.RLock()
+			for _, v := range user.UserMap {
+				userNumList = append(userNumList, v.Name)
+			}
+			user.MapRsync.RUnlock()
+			conn.Write([]byte(strings.Join(userNumList, ",")))
 		default:
 			fmt.Println("unknow the cmd")
 		}
